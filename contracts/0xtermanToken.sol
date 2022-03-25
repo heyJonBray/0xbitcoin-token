@@ -2,32 +2,18 @@ pragma solidity ^0.4.18;
 
 
 // ----------------------------------------------------------------------------
-
-// '0xBitcoin Token' contract
-
+// '0xterman Token' contract
 // Mineable ERC20 Token using Proof Of Work
-
 //
-
-// Symbol      : 0xBTC
-
-// Name        : 0xBitcoin Token
-
-// Total supply: 21,000,000.00
-
+// Symbol      : 0xter
+// Name        : 0xterman Token
+// Total supply: 1,000,000,000 (1B)
 // Decimals    : 8
-
 //
-
-
 // ----------------------------------------------------------------------------
 
-
-
 // ----------------------------------------------------------------------------
-
 // Safe maths
-
 // ----------------------------------------------------------------------------
 
 library SafeMath {
@@ -265,13 +251,13 @@ contract _0xBitcoinToken is ERC20Interface, Owned {
 
 
 
-        symbol = "0xBTC";
+        symbol = "0xter";
 
-        name = "0xBitcoin Token";
+        name = "0xterman Token";
 
         decimals = 8;
 
-        _totalSupply = 21000000 * 10**uint(decimals);
+        _totalSupply = 1000000000 * 10**uint(decimals);
 
         if(locked) revert();
         locked = true;
@@ -346,15 +332,15 @@ contract _0xBitcoinToken is ERC20Interface, Owned {
 
       //if max supply for the era will be exceeded next reward round then enter the new era before that happens
 
-      //40 is the final reward era, almost all tokens minted
+      //100 is the final reward era, almost all tokens minted
       //once the final era is reached, more tokens will not be given out because the assert function
-      if( tokensMinted.add(getMiningReward()) > maxSupplyForEra && rewardEra < 39)
+      if( tokensMinted.add(getMiningReward()) > maxSupplyForEra && rewardEra < 99)
       {
         rewardEra = rewardEra + 1;
       }
 
       //set the next minted supply at which the era will change
-      // total supply is 2100000000000000  because of 8 decimal places
+      // total supply is 100000000000000000 - including 8 decimal places
       maxSupplyForEra = _totalSupply - _totalSupply.div( 2**(rewardEra + 1));
 
       epochCount = epochCount.add(1);
@@ -370,15 +356,7 @@ contract _0xBitcoinToken is ERC20Interface, Owned {
       //do this last since this is a protection mechanism in the mint() function
       challengeNumber = block.blockhash(block.number - 1);
 
-
-
-
-
-
     }
-
-
-
 
     //https://en.bitcoin.it/wiki/Difficulty#What_is_the_formula_for_difficulty.3F
     //as of 2017 the bitcoin difficulty was up to 17 zeroes, it was only 8 in the early days
@@ -390,10 +368,10 @@ contract _0xBitcoinToken is ERC20Interface, Owned {
         uint ethBlocksSinceLastDifficultyPeriod = block.number - latestDifficultyPeriodStarted;
         //assume 360 ethereum blocks per hour
 
-        //we want miners to spend 10 minutes to mine each 'block', about 60 ethereum blocks = one 0xbitcoin epoch
+        //we want miners to spend 2 minutes to mine each 'block', about 12 ethereum blocks = one 0xterman epoch
         uint epochsMined = _BLOCKS_PER_READJUSTMENT; //256
 
-        uint targetEthBlocksPerDiffPeriod = epochsMined * 60; //should be 60 times slower than ethereum
+        uint targetEthBlocksPerDiffPeriod = epochsMined * 12; //should be 12 times slower than ethereum
 
         //if there were less eth blocks passed in time than expected
         if( ethBlocksSinceLastDifficultyPeriod < targetEthBlocksPerDiffPeriod )
@@ -446,14 +424,13 @@ contract _0xBitcoinToken is ERC20Interface, Owned {
 
 
 
-    //21m coins total
-    //reward begins at 50 and is cut in half every reward era (as tokens are mined)
+    // 1B coins total
+    // Reward begins at 120 and is cut in half every reward era (as tokens are mined)
     function getMiningReward() public constant returns (uint) {
-        //once we get half way thru the coins, only get 25 per block
+        // When half the coins for first era are mined, reduce to 60
+        // every reward era, the reward amount halves.
 
-         //every reward era, the reward amount halves.
-
-         return (50 * 10**uint(decimals) ).div( 2**rewardEra ) ;
+         return (120 * 10**uint(decimals) ).div( 2**rewardEra ) ;
 
     }
 
@@ -480,9 +457,7 @@ contract _0xBitcoinToken is ERC20Interface, Owned {
 
 
     // ------------------------------------------------------------------------
-
     // Total supply
-
     // ------------------------------------------------------------------------
 
     function totalSupply() public constant returns (uint) {
@@ -494,9 +469,7 @@ contract _0xBitcoinToken is ERC20Interface, Owned {
 
 
     // ------------------------------------------------------------------------
-
     // Get the token balance for account `tokenOwner`
-
     // ------------------------------------------------------------------------
 
     function balanceOf(address tokenOwner) public constant returns (uint balance) {
@@ -508,13 +481,10 @@ contract _0xBitcoinToken is ERC20Interface, Owned {
 
 
     // ------------------------------------------------------------------------
-
     // Transfer the balance from token owner's account to `to` account
-
     // - Owner's account must have sufficient balance to transfer
-
+    //
     // - 0 value transfers are allowed
-
     // ------------------------------------------------------------------------
 
     function transfer(address to, uint tokens) public returns (bool success) {
@@ -532,19 +502,12 @@ contract _0xBitcoinToken is ERC20Interface, Owned {
 
 
     // ------------------------------------------------------------------------
-
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
-
     // from the token owner's account
-
     //
-
-    // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
-
+    // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.m
     // recommends that there are no checks for the approval double-spend attack
-
     // as this should be implemented in user interfaces
-
     // ------------------------------------------------------------------------
 
     function approve(address spender, uint tokens) public returns (bool success) {
@@ -560,21 +523,14 @@ contract _0xBitcoinToken is ERC20Interface, Owned {
 
 
     // ------------------------------------------------------------------------
-
     // Transfer `tokens` from the `from` account to the `to` account
-
     //
-
     // The calling account must already have sufficient tokens approve(...)-d
-
     // for spending from the `from` account and
-
     // - From account must have sufficient balance to transfer
-
     // - Spender must have sufficient allowance to transfer
-
+    //
     // - 0 value transfers are allowed
-
     // ------------------------------------------------------------------------
 
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
@@ -594,11 +550,8 @@ contract _0xBitcoinToken is ERC20Interface, Owned {
 
 
     // ------------------------------------------------------------------------
-
     // Returns the amount of tokens approved by the owner that can be
-
     // transferred to the spender's account
-
     // ------------------------------------------------------------------------
 
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
@@ -610,13 +563,9 @@ contract _0xBitcoinToken is ERC20Interface, Owned {
 
 
     // ------------------------------------------------------------------------
-
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
-
     // from the token owner's account. The `spender` contract function
-
     // `receiveApproval(...)` is then executed
-
     // ------------------------------------------------------------------------
 
     function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success) {
@@ -634,9 +583,7 @@ contract _0xBitcoinToken is ERC20Interface, Owned {
 
 
     // ------------------------------------------------------------------------
-
     // Don't accept ETH
-
     // ------------------------------------------------------------------------
 
     function () public payable {
@@ -648,9 +595,8 @@ contract _0xBitcoinToken is ERC20Interface, Owned {
 
 
     // ------------------------------------------------------------------------
-
     // Owner can transfer out any accidentally sent ERC20 tokens
-
+    // TODO: Add Ownable & Admin rights.
     // ------------------------------------------------------------------------
 
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
